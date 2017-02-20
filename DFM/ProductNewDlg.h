@@ -46,6 +46,7 @@ public:
 	bool bInfoWrited;                 //产品信息是否已写入
 	CString m_EvalType;               //评价类型名称
 	CString str_EvalTypeID;           //评价类型ID
+	CString m_TypeInfo;               //评价类型介绍
 
 	CString strProductID;             //list获取的产品ID,此处为CString型
 	CRect m_rectPanel;                //子对话框的包围圈

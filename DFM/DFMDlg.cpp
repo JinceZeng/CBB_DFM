@@ -562,33 +562,37 @@ void CDFMDlg::OnEvalnew()
 {
 	// TODO: Add your command handler code here
 	CChooseEvalType dlg1;
-	CProductNewDlg dlg2;
-	CProductNew1Dlg dlg3;
-	CProductNew2Dlg dlg4;
-	CProductNew3Dlg dlg5;
+	CProductNewDlg dlg2;     //模块装配
+	CProductNew1Dlg dlg3;    //结构件加工
+	CProductNew2Dlg dlg4;    //结构件锻造
+	CProductNew3Dlg dlg5;    //射频电缆组装
 	if (dlg1.DoModal()==IDOK)
 	{
 		int nModelID=dlg1.m_nModelID;
 		switch(nModelID)
 		{
 		case 1:               //模型一调用评分一
-			dlg2.str_EvalTypeID=(CString)(char *)(_bstr_t)(nModelID);
+			dlg2.str_EvalTypeID=(CString)(char *)(_bstr_t)(nModelID); //int转cstring
 			dlg2.m_EvalType=dlg1.m_EvalType;
+			dlg2.m_TypeInfo=CString("用于评价CBB模块装配的可制造性");
 			dlg2.DoModal();
 			break;
 		case 2:
 			dlg3.str_EvalTypeID=(CString)(char *)(_bstr_t)(nModelID);
 			dlg3.m_EvalType=dlg1.m_EvalType;
+			dlg3.m_TypeInfo=CString("用于评价CBB结构件采用数铣等一般加工方法的可制造性");
 			dlg3.DoModal();
 			break;
 		case 3:
 			dlg4.str_EvalTypeID=(CString)(char *)(_bstr_t)(nModelID);
 			dlg4.m_EvalType=dlg1.m_EvalType;
+			dlg4.m_TypeInfo=CString("用于评价CBB结构件采用锻造加工的可制造性");
 			dlg4.DoModal();
 			break;
 		case 4:
 			dlg5.str_EvalTypeID=(CString)(char *)(_bstr_t)(nModelID);
 			dlg5.m_EvalType=dlg1.m_EvalType;
+			dlg5.m_TypeInfo=CString("用于评价CBB电缆组件组装的可制造性");
 			dlg5.DoModal();
 			break;
 		default:

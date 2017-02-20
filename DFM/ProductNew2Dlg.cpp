@@ -117,6 +117,7 @@ BOOL CProductNew2Dlg::OnInitDialog()
 	{
 		pStep0->str_EvalTypeID=str_EvalTypeID;
 		pStep0->m_EvalType=m_EvalType;
+		pStep0->m_TypeInfo=m_TypeInfo;
 		::SendMessage(pStep0->m_hWnd,WM_UPDATEDATA,FALSE,FALSE);//更新控件信息
 
 	}
