@@ -87,12 +87,12 @@ BEGIN_MESSAGE_MAP(CDFMDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-//控件大小位置变化(暂未使用此功能)
-//BEGIN_EASYSIZE_MAP(CDFMDlg, CDialogEx) 
-//	EASYSIZE(IDC_MODELNEW,ES_BORDER,ES_BORDER,IDC_EVALRESULT,ES_KEEPSIZE,ES_HCENTER) //此处根据自己需求 
-//	EASYSIZE(IDC_EVALRESULT,IDC_MODELNEW,ES_BORDER,ES_BORDER,ES_KEEPSIZE,ES_HCENTER)
-//	EASYSIZE(IDC_LIST_PRODUCTINFO,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
-//END_EASYSIZE_MAP 
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CDFMDlg, CDialogEx) 
+	EASYSIZE(IDC_MODELNEW,ES_BORDER,ES_BORDER,ES_KEEPSIZE,ES_KEEPSIZE,0) //此处根据自己需求 
+	EASYSIZE(IDC_EVALRESULT,IDC_MODELNEW,ES_BORDER,ES_BORDER,ES_KEEPSIZE,ES_HCENTER)
+	EASYSIZE(IDC_LIST_PRODUCTINFO,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 
 // CDFMDlg 消息处理程序
 
@@ -100,56 +100,93 @@ BOOL CDFMDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME)), TRUE);
+	// 将“关于...”菜单项添加到系统菜单中。
 
+	// IDM_ABOUTBOX 必须在系统命令范围内。
+	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
+	ASSERT(IDM_ABOUTBOX < 0xF000);
 
-	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
-	//  执行此操作
+	CMenu* pSysMenu = GetSystemMenu(FALSE);
+	if (pSysMenu != NULL)
+	{
+		BOOL bNameValid;
+		CString strAboutMenu;
+		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
+		ASSERT(bNameValid);
+		if (!strAboutMenu.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+		}
+	}
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	UINT indicators[] = 
-	{
-		IDS_INDICATOR_MESSAGE,
-		IDS_INDICATOR_USER,
-		IDS_INDICATOR_TIME
-	};
-	ModifyStyle(WS_THICKFRAME,0);
-	if(!m_Statusbar.Create(this)||
-		!m_Statusbar.SetIndicators(indicators,sizeof(indicators)/sizeof(UINT)))
-	{
-		TRACE0("Can't create status bar\n");
-		return false;
+	// 设置图标
+	SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME)), TRUE);
+	
+	//UINT indicators[] = 
+	//{
+	//	IDS_INDICATOR_MESSAGE,
+	//	IDS_INDICATOR_USER,
+	//	IDS_INDICATOR_TIME
+	//};
+	//ModifyStyle(WS_THICKFRAME,0);
+	//if(!m_Statusbar.Create(this)||
+	//	!m_Statusbar.SetIndicators(indicators,sizeof(indicators)/sizeof(UINT)))
+	//{
+	//	TRACE0("Can't create status bar\n");
+	//	return false;
+	//}
+	//ModifyStyle(0,WS_THICKFRAME);
+
+	////获取IDS_INDICATOR_MESSAGE,IDS_INDICATOR_USER，IDS_INDICATOR_TIME的索引和对应的宽度
+	//index1 = m_Statusbar.CommandToIndex(IDS_INDICATOR_MESSAGE);
+	//index2 = m_Statusbar.CommandToIndex(IDS_INDICATOR_USER);
+	//index3 = m_Statusbar.CommandToIndex(IDS_INDICATOR_TIME);
+
+	//m_Statusbar.GetPaneInfo(index1,nID,nStyle,nWidth1);
+	//m_Statusbar.GetPaneInfo(index2,nID,nStyle,nWidth2);
+	//m_Statusbar.GetPaneInfo(index3,nID,nStyle,nWidth3);
+
+	//CRect rect;
+	//GetClientRect(&rect);
+
+	////设置面板的宽度
+	//m_Statusbar.SetPaneInfo(index1,nID,nStyle,rect.Width()/2);
+	//m_Statusbar.SetPaneInfo(index2,nID,nStyle,rect.Width()/3);
+	//m_Statusbar.SetPaneInfo(index3,nID,nStyle,rect.Width()/6);
+
+	///////////////////////////////////////////////////////状态栏相关
+	//UINT Array[5];
+	CTime time;
+	time = CTime::GetCurrentTime();
+	CString Str = time.Format("%Y-%m-%d");
+	for (int i = 0; i < 4; i++){
+		Array[i] = 10000 + i;
 	}
-	ModifyStyle(0,WS_THICKFRAME);
-
-	//获取IDS_INDICATOR_MESSAGE,IDS_INDICATOR_USER，IDS_INDICATOR_TIME的索引和对应的宽度
-	index1 = m_Statusbar.CommandToIndex(IDS_INDICATOR_MESSAGE);
-	index2 = m_Statusbar.CommandToIndex(IDS_INDICATOR_USER);
-	index3 = m_Statusbar.CommandToIndex(IDS_INDICATOR_TIME);
-
-	m_Statusbar.GetPaneInfo(index1,nID,nStyle,nWidth1);
-	m_Statusbar.GetPaneInfo(index2,nID,nStyle,nWidth2);
-	m_Statusbar.GetPaneInfo(index3,nID,nStyle,nWidth3);
-
+	m_Statusbar.Create(this);
+	m_Statusbar.SetIndicators(Array, 4);
+	//for (int i = 0; i < 3; i++){
+	//m_Statusbar.SetPaneInfo(i, Array[i], 0, 80);
+	//}
 	CRect rect;
 	GetClientRect(&rect);
-
-	//设置面板的宽度
-	m_Statusbar.SetPaneInfo(index1,nID,nStyle,rect.Width()/2);
-	m_Statusbar.SetPaneInfo(index2,nID,nStyle,rect.Width()/3);
-	m_Statusbar.SetPaneInfo(index3,nID,nStyle,rect.Width()/6);
-
+	m_Statusbar.SetPaneInfo(0, Array[0], 0, rect.Width()/3);
+	m_Statusbar.SetPaneInfo(1, Array[1], 0, rect.Width()/3);
+	m_Statusbar.SetPaneInfo(2, Array[2], 0, rect.Width()/3);
+	m_Statusbar.SetPaneText(0, CString("可制造性评价系统"));
+	m_Statusbar.SetPaneText(2,CString("当前时间") + Str);
 	//重新摆放控件 因为增加状态栏之后 控件相对位置发生变化  重新摆放才能显示出来
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST,AFX_IDW_CONTROLBAR_LAST,0); 
 
-	//设置文本 index=0，2处的文本内容
-	CString str1=_T("可制造性评价");
-	CTime time;
-	time = CTime::GetCurrentTime();
-	CString str2 = time.Format("%Y-%m-%d");
-	m_Statusbar.SetPaneText(0,str1);
-	m_Statusbar.SetPaneText(2,str2);
+	////设置文本 index=0，2处的文本内容
+	//CString str1=_T("可制造性评价");
+	//CTime time;
+	//time = CTime::GetCurrentTime();
+	//CString str2 = time.Format("%Y-%m-%d");
+	//m_Statusbar.SetPaneText(0,str1);
+	//m_Statusbar.SetPaneText(2,str2);
 
 
     //菜单项初始化变灰操作
@@ -185,7 +222,7 @@ BOOL CDFMDlg::OnInitDialog()
 	m_ProductInfoList.InsertColumn(8,_T("评价时间"),LVCFMT_CENTER,width1/8);
 
 	OnMenuLogin();
-	//INIT_EASYSIZE;
+	INIT_EASYSIZE;
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -240,7 +277,7 @@ HCURSOR CDFMDlg::OnQueryDragIcon()
 }
 
 
-//响应窗口大小变化（暂未使用）
+//响应窗口大小变化
 void CDFMDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
@@ -257,16 +294,87 @@ void CDFMDlg::OnSize(UINT nType, int cx, int cy)
 
 		m_pwndStatusBar->GetClientRect(&rectBar);  
 
-		m_pwndStatusBar->SetPaneInfo(index1,nID,nStyle,rectDlg.Width()/2); 
-		m_pwndStatusBar->SetPaneInfo(index2,nID,nStyle,rectDlg.Width()/3);
-		m_pwndStatusBar->SetPaneInfo(index3,nID,nStyle,rectDlg.Width()/6); 
+		m_pwndStatusBar->SetPaneInfo(0,Array[0],0,rectDlg.Width()/3); 
+		m_pwndStatusBar->SetPaneInfo(1,Array[1],0,rectDlg.Width()/3);
+		m_pwndStatusBar->SetPaneInfo(2,Array[2],0,rectDlg.Width()/3); 
 		m_pwndStatusBar->MoveWindow(0,cy-rectBar.Height(),rectDlg.Width(),rectBar.Height());  
 
 	}
+	if (m_ProductInfoList&&(0 != rectDlg.Width()))   //list内容刷新
+	{
+		//CRect rec1;
+		//int width1;
+		//m_ProductInfoList.GetClientRect(&rec1);
+		//width1=rec1.Width();
+		//if(0!=width1)//如果窗口宽度不为零则重绘list
+		//{
+		//	int  nColumnCount = m_ProductInfoList.GetHeaderCtrl()->GetItemCount();
+		//	for (int i=nColumnCount-1;i>=0;--i)
+		//	{
+		//		m_ProductInfoList.DeleteColumn(i);
+		//	}
+		//	m_ProductInfoList.InsertColumn(0,_T("序号"), LVCFMT_CENTER,width1/16);
+		//	m_ProductInfoList.InsertColumn(1,_T("ID"), LVCFMT_CENTER,width1/16);
+		//	m_ProductInfoList.InsertColumn(2,_T("产品名称"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(3,_T("产品编号"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(4,_T("隶属整件"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(5,_T("评价模型"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(6,_T("任务状态"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(7,_T("评价人"),LVCFMT_CENTER,width1/8);
+		//	m_ProductInfoList.InsertColumn(8,_T("评价时间"),LVCFMT_CENTER,width1/8);
 
-	//UPDATE_EASYSIZE;
+		//	UpdateListCtrl();
+		//}
+		//AutoAdjustColumnWidth(&m_ProductInfoList);
 
+
+		if(m_ProductInfoList.m_hWnd != NULL)
+		{
+			CRect rc;
+			m_ProductInfoList.GetClientRect(rc);
+			//m_ProductInfoList.MoveWindow(rc);
+			//
+			int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+			int nWidth = rc.Width() - nScrollWidth - 2;
+			if(nWidth > 720)
+			{
+				m_ProductInfoList.SetColumnWidth(0,nWidth/16);
+				m_ProductInfoList.SetColumnWidth(1,nWidth/16);
+				m_ProductInfoList.SetColumnWidth(2,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(3,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(4,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(5,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(6,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(7,nWidth/8);
+				m_ProductInfoList.SetColumnWidth(8,nWidth/8);
+			}  
+		}
+	}
+	
+	UPDATE_EASYSIZE;
 }
+
+
+//比例有问题未使用
+/*void CDFMDlg::AutoAdjustColumnWidth(CListCtrl *pListCtrl)  
+{  
+	pListCtrl->SetRedraw(FALSE);  
+	CHeaderCtrl *pHeader = pListCtrl->GetHeaderCtrl();  
+	int nColumnCount = pHeader->GetItemCount();  
+
+
+	for(int i = 0; i < nColumnCount; i++)  
+	{  
+		pListCtrl->SetColumnWidth(i, LVSCW_AUTOSIZE);  
+		int nColumnWidth = pListCtrl->GetColumnWidth(i);  
+		pListCtrl->SetColumnWidth(i, LVSCW_AUTOSIZE_USEHEADER);  
+		int nHeaderWidth = pListCtrl->GetColumnWidth(i);  
+
+
+		pListCtrl->SetColumnWidth(i, max(nColumnWidth, nHeaderWidth)+5);  
+	}  
+	pListCtrl->SetRedraw(TRUE);  
+}*/  
 
 
 void CDFMDlg::ChangeStyle(CPInfoListCtrl &m_ListCtrl)
@@ -386,17 +494,18 @@ void CDFMDlg::OnMenuLogin()
 //自定义消息删除某一条产品信息
 LRESULT CDFMDlg::OnDeleteData(WPARAM wParam,LPARAM lParam)
 {
-	m_ProductInfoList.DeleteItem(wParam);
 	CString str((TCHAR*)lParam);   //lparam转cstring(此处必须用tchar,char会导致精度损耗)
 	CString strProductNam = m_ProductInfoList.GetItemText(wParam,2);
-	CString strProductNum = m_ProductInfoList.GetItemText(wParam,3);
+	CString strProductSub = m_ProductInfoList.GetItemText(wParam,4);
 	CString strUserNam    = m_ProductInfoList.GetItemText(wParam,7);
 	_RecordsetPtr m_pRs;
+
+	m_ProductInfoList.DeleteItem(wParam);
 	CString sql = CString("delete * from ProductInfo where ProductID=") + str;//删除产品信息及相应的中间评价数据和评价结果数据
-	CString sql1= CString("delete * from ChartInfoSave where ProductNam='") + strProductNam+CString("'and ProductNum='")+strProductNum+CString("'and Uname='")+strUserNam+("'");
-	CString sql2= CString("delete * from EvalResult where ProductNam='") + strProductNam+CString("'and ProductNum='")+strProductNum+CString("'and Uname='")+strUserNam+("'");
-	CString sql3= CString("delete * from LowValResult where ProductNam='") + strProductNam+CString("'and ProductNum='")+strProductNum+CString("'and Uname='")+strUserNam+("'");
-	CString sql4= CString("delete * from TechEvalResult where ProductNam='") + strProductNam+CString("'and ProductNum='")+strProductNum+CString("'and Uname='")+strUserNam+("'");
+	CString sql1= CString("delete * from ChartInfoSave where ProductNam='") + strProductNam+"'and ProductSub='"+strProductSub+"'and Uname='"+strUserNam+("'");
+	CString sql2= CString("delete * from EvalResult where ProductNam='") + strProductNam+CString("'and ProductSub='")+strProductSub+CString("'and Uname='")+strUserNam+("'");
+	CString sql3= CString("delete * from LowValResult where ProductNam='") + strProductNam+CString("'and ProductSub='")+strProductSub+CString("'and Uname='")+strUserNam+("'");
+	CString sql4= CString("delete * from TechEvalResult where ProductNam='") + strProductNam+CString("'and ProductSub='")+strProductSub+CString("'and Uname='")+strUserNam+("'");
 	
 	try
 	{
@@ -470,19 +579,20 @@ LRESULT CDFMDlg::OnEvalIn(WPARAM wParam,LPARAM lParam)
 //自定义消息查看评价结果
 LRESULT CDFMDlg::OnCheck(WPARAM wParam,LPARAM lParam)
 {
-	CString strName=m_ProductInfoList.GetItemText(wParam,2);
-	CString strNum=m_ProductInfoList.GetItemText(wParam,3);
+	CString strProductNam = m_ProductInfoList.GetItemText(wParam,2);
+	CString strProductSub = m_ProductInfoList.GetItemText(wParam,4);
+	CString strUserNam    = m_ProductInfoList.GetItemText(wParam,7);
 
 	_RecordsetPtr m_pRs;    //读取综合评价结果表
 	vector<CString> m_ItemVal; //结果值保存
-	CString sql = CString("select * from EvalResult where ProductNum='") + strNum +CString("'and Uname= '")+theApp.name+CString("'");
+	CString sql = CString("select * from EvalResult where ProductSub='") + strProductSub+CString("'and ProductNam= '")+strProductNam +CString("'and Uname= '")+strUserNam+CString("'");
 	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
 	CString str1 =  m_pRs->GetCollect("IntegEvalVal");
 	CString str2 =  m_pRs->GetCollect("IntegEvalResult");
 	CString str3 =  m_pRs->GetCollect("LowValResult");
 	CString str4 =  m_pRs->GetCollect("IndexValResult");
-	m_ItemVal.push_back(strName);  //产品名称
-	m_ItemVal.push_back(strNum);   //产品编号
+	m_ItemVal.push_back(strProductNam);  //产品名称
+	m_ItemVal.push_back(strProductSub);   //产品隶属组件
 	m_ItemVal.push_back(str1);      //综合评价分值
 	m_ItemVal.push_back(str2);   //综合评价结果
 	m_ItemVal.push_back(str3);   //低分项及改进显示
@@ -490,7 +600,7 @@ LRESULT CDFMDlg::OnCheck(WPARAM wParam,LPARAM lParam)
 
 	_RecordsetPtr m_pRs1;    //读取低分项表
 	vector<CLowValItem> m_LowValItem;//低分项保存
-	CString sql1 = CString("select * from LowValResult where ProductNum='") + strNum +CString("'and Uname= '")+theApp.name+CString("'");
+	CString sql1 = CString("select * from LowValResult where ProductSub='") + strProductSub+CString("'and ProductNam= '")+strProductNam +CString("'and Uname= '")+theApp.name+CString("'");
 	m_pRs1 = theApp.m_pConnect->Execute(_bstr_t(sql1), NULL, adCmdText);
 	int n=0;
 	while (!m_pRs1->adoEOF)
@@ -513,7 +623,7 @@ LRESULT CDFMDlg::OnCheck(WPARAM wParam,LPARAM lParam)
 
 	_RecordsetPtr m_pRs2;    //读取指标评分表
 	vector<CIndexValItem> m_IndexVal;//指标评分保存
-	CString sql2 = CString("select * from TechEvalResult where ProductNum='") + strNum +CString("'and Uname= '")+theApp.name+CString("'");
+	CString sql2 = CString("select * from TechEvalResult where ProductSub='") +strProductSub+CString("'and ProductNam= '")+strProductNam +CString("'and Uname= '")+theApp.name+CString("'");
 	m_pRs2 = theApp.m_pConnect->Execute(_bstr_t(sql2), NULL, adCmdText);
 	int m=0;
 	while (!m_pRs2->adoEOF)
@@ -610,13 +720,13 @@ void CDFMDlg::OnProductEvalval()
 	if(dlg.DoModal()==IDOK)
 	{
 		CString strName=dlg.m_CheckName;
-		CString strNum=dlg.m_CheckNum;
+		CString strSub=dlg.m_CheckSub;
 		CString strUName=dlg.m_CheckUName;
 
 
 		_RecordsetPtr m_pRs;    //读取综合评价结果表
 		vector<CString> m_ItemVal; //结果值保存
-		CString sql = CString("select * from EvalResult where ProductNum='") + strNum +CString("'and Uname= '")+strUName+CString("'");
+		CString sql = CString("select * from EvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+strUName+CString("'");
 		m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
 		int k=0;
 		CString str1,str2,str3,str4;
@@ -635,7 +745,7 @@ void CDFMDlg::OnProductEvalval()
 			return;
 		}
 		m_ItemVal.push_back(strName);  //产品名称
-		m_ItemVal.push_back(strNum);   //产品编号
+		m_ItemVal.push_back(strSub);   //产品隶属组件
 		m_ItemVal.push_back(str1);     //综合评价分值
 		m_ItemVal.push_back(str2);     //综合评价结果
 		m_ItemVal.push_back(str3);     //低分项及改进显示
@@ -643,7 +753,7 @@ void CDFMDlg::OnProductEvalval()
 
 		_RecordsetPtr m_pRs1;    //读取低分项表
 		vector<CLowValItem> m_LowValItem;//低分项保存
-		CString sql1 = CString("select * from LowValResult where ProductNum='") + strNum +CString("'and Uname= '")+theApp.name+CString("'");
+		CString sql1 = CString("select * from LowValResult where ProductSub='") + strSub +CString("'and ProductNam='")+strName+CString("'and Uname= '")+theApp.name+CString("'");
 		m_pRs1 = theApp.m_pConnect->Execute(_bstr_t(sql1), NULL, adCmdText);
 		int n=0;
 		while (!m_pRs1->adoEOF)
@@ -666,7 +776,7 @@ void CDFMDlg::OnProductEvalval()
 
 		_RecordsetPtr m_pRs2;    //读取指标评分表
 		vector<CIndexValItem> m_IndexVal;//指标评分保存
-		CString sql2 = CString("select * from TechEvalResult where ProductNum='") + strNum +CString("'and Uname= '")+theApp.name+CString("'");
+		CString sql2 = CString("select * from TechEvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+theApp.name+CString("'");
 		m_pRs2 = theApp.m_pConnect->Execute(_bstr_t(sql2), NULL, adCmdText);
 		int m=0;
 		while (!m_pRs2->adoEOF)

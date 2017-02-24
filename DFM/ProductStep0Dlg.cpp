@@ -96,12 +96,12 @@ DWORD CProductStep0Dlg::OnWizardNext()
 	//str_EvalType=(CString)(char *)(_bstr_t)(m_EvalTypeVal+1);//int转Cstring
 	CTime time;
 	time = CTime::GetCurrentTime();
-	CString str_Time = time.Format("%Y-%m-%d %H:%M:%S");
+	CString str_Time = time.Format("%Y-%m-%d");
 	CString str_IsEval;
 	str_IsEval=(CString)(char *)(_bstr_t)(m_isEval);
 
 	//遍历数据库避免保存相同产品信息
-	CString sql=CString("select * from ProductInfo where ProductNam ='")+m_ProductName+CString("' and ProductSub='")+m_ProductSub+CString("'and EvalModelID=")+str_EvalTypeID;
+	CString sql=CString("select * from ProductInfo where ProductNam ='")+m_ProductName+CString("' and ProductSub='")+m_ProductSub+CString("'and Uname='")+theApp.name+CString("'and EvalModelID=")+str_EvalTypeID;
 	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
 	int nCount=0;
 	while (!m_pRs->adoEOF)
@@ -123,8 +123,8 @@ DWORD CProductStep0Dlg::OnWizardNext()
 		//str_IsEval=m_ProductName+CString("_")+str;
 		try
 		{
-		theApp.m_pConnect->Execute((_bstr_t)(CString("insert into ProductInfo(ProductNam,ProductNum,ProductSub,EvalModelID,EvalTypeIntro,IsEval,EvalTime) values('")
-			+m_ProductName+"','"+m_ProductNum+"','"+m_ProductSub+"',"+str_EvalTypeID+",'"+m_TypeInfo+"',"+str_IsEval+",'"+str_Time+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
+		theApp.m_pConnect->Execute((_bstr_t)(CString("insert into ProductInfo(ProductNam,ProductNum,ProductSub,Uname,EvalModelID,EvalTypeIntro,IsEval,EvalTime) values('")
+			+m_ProductName+"','"+m_ProductNum+"','"+m_ProductSub+"','"+theApp.name+"',"+str_EvalTypeID+",'"+m_TypeInfo+"',"+str_IsEval+",'"+str_Time+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
 		}
 		catch(_com_error e)
 		{

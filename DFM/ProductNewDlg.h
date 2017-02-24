@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 #include "goldata.h"
+#include "EasySize.h"
 
 //矩阵运算库eigen3.3
 #include <Eigen/Dense>
@@ -24,7 +25,7 @@ using namespace Eigen;
 class CProductNewDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CProductNewDlg)
-
+	DECLARE_EASYSIZE
 public:
 	CProductNewDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CProductNewDlg();
@@ -39,6 +40,8 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnPaint();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnDestroy();
 public:
 	vector<CDialogEx*> m_pPageList;   //记录各子对话框

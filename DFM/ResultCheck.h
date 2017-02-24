@@ -19,7 +19,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CString m_CheckNum;           //查询编号
+	CString m_CheckSub;           //查询产品隶属组件
 	CString m_CheckUName;         //查询评价人
 	CString m_CheckName;          //查询产品名
 	afx_msg void OnBnClickedOk();

@@ -75,7 +75,7 @@ void CProductOutDlg::GetItemInfo(vector<CString>& ItemVal)
 	int nItem=1;
 	vector<CString> strItemNam;
 	strItemNam.push_back(CString("产品名称"));
-	strItemNam.push_back(CString("产品编号"));
+	strItemNam.push_back(CString("产品隶属组件"));
 	strItemNam.push_back(CString("综合评价分值"));
 	strItemNam.push_back(CString("综合评价结果"));
 	strItemNam.push_back(CString("低分项及改进建议"));
@@ -140,7 +140,7 @@ void CProductOutDlg::OnBnClickedOk()
 	// TODO: Add your control notification handler code here
 	//遍历数据库避免保存相同产品信息
 	_RecordsetPtr m_pRs;
-	CString sql=CString("select * from EvalResult where ProductNam ='")+m_ListCtrlItem[0].m_ItemVal+CString("'and ProductNum='")+m_ListCtrlItem[1].m_ItemVal+CString("'and Uname='")+theApp.name+("'");
+	CString sql=CString("select * from EvalResult where ProductNam ='")+m_ListCtrlItem[0].m_ItemVal+CString("'and ProductSub='")+m_ListCtrlItem[1].m_ItemVal+CString("'and Uname='")+theApp.name+("'");
 	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
 	int nCount=0;
 	while (!m_pRs->adoEOF)
@@ -149,42 +149,37 @@ void CProductOutDlg::OnBnClickedOk()
 		m_pRs->MoveNext();
 
 	}
-	if(nCount>0){
+	if(nCount>0)
+	{
 		AfxMessageBox(CString("已评价该产品，无需重新保存"));
-		return ;
 	}
-	try
+	else
 	{
 		//保存整体评价值
-		theApp.m_pConnect->Execute((_bstr_t)(CString("insert into EvalResult(ProductNam,ProductNum,Uname,IntegEvalVal,IntegEvalResult,LowValResult,IndexValResult) values('")
+		theApp.m_pConnect->Execute((_bstr_t)(CString("insert into EvalResult(ProductNam,ProductSub,Uname,IntegEvalVal,IntegEvalResult,LowValResult,IndexValResult) values('")
 			+m_ListCtrlItem[0].m_ItemVal+"','"+m_ListCtrlItem[1].m_ItemVal+"','"+theApp.name+"','"+m_ListCtrlItem[2].m_ItemVal+"','"+m_ListCtrlItem[3].m_ItemVal+"','"+m_ListCtrlItem[4].m_ItemVal+"','"+m_ListCtrlItem[5].m_ItemVal+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
 		
 		//保存低分项
 		for(int i=0;i<m_LowValItem.size();++i)
 		{
-			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into LowValResult(ProductNam,ProductNum,Uname,ChartName,IndexClass,IndexName,IndexComment,Advice) values('")
+			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into LowValResult(ProductNam,ProductSub,Uname,ChartName,IndexClass,IndexName,IndexComment,Advice) values('")
 				+m_ListCtrlItem[0].m_ItemVal+"','"+m_ListCtrlItem[1].m_ItemVal+"','"+theApp.name+"','"+m_LowValItem[i].m_ChartNam+"','"+m_LowValItem[i].m_Classify+"','"+m_LowValItem[i].m_TechEvalIndex+"','"+m_LowValItem[i].m_IndexComment+"','"+m_LowValItem[i].m_LowValAdvice+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
 		}
 
 		//保存指标评分值
 		for(int i=0;i<m_IndexVal.size();++i)
 		{
-			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into TechEvalResult(ProductNam,ProductNum,Uname,IndexName,IndexVal) values('")
+			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into TechEvalResult(ProductNam,ProductSub,Uname,IndexName,IndexVal) values('")
 				+m_ListCtrlItem[0].m_ItemVal+"','"+m_ListCtrlItem[1].m_ItemVal+"','"+theApp.name+"','"+m_IndexVal[i].m_IndexNam+"','"+m_IndexVal[i].m_IndexVal+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
 		}
 
 		//更新产品评价状态
-		theApp.m_pConnect->Execute((_bstr_t)(CString("update ProductInfo set IsEval=")+CString("1 where ProductNam='")+m_ListCtrlItem[0].m_ItemVal+CString("' and ProductNum='")+m_ListCtrlItem[1].m_ItemVal+CString("'")) , NULL, adCmdText);
-	}
-	catch(_com_error e)
-	{
-		CString temp;
-		temp.Format(e.Description());
-		AfxMessageBox(temp);
-		return ;
+		theApp.m_pConnect->Execute((_bstr_t)(CString("update ProductInfo set IsEval=")+CString("1 where ProductNam='")+m_ListCtrlItem[0].m_ItemVal+CString("' and ProductSub='")+m_ListCtrlItem[1].m_ItemVal+CString("'and Uname='")+theApp.name+CString("'")) , NULL, adCmdText);
+		
+		AfxMessageBox(CString("评价结果保存成功"));	
 	}
 
-	AfxMessageBox(CString("评价结果保存成功"));
+	
 
 	CDialogEx::OnOK();
 }

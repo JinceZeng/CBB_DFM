@@ -13,7 +13,7 @@ IMPLEMENT_DYNAMIC(CResultCheck, CDialogEx)
 
 CResultCheck::CResultCheck(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CResultCheck::IDD, pParent)
-	, m_CheckNum(_T(""))
+	, m_CheckSub(_T(""))
 	, m_CheckUName(_T(""))
 	, m_CheckName(_T(""))
 {
@@ -27,7 +27,7 @@ CResultCheck::~CResultCheck()
 void CResultCheck::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_CHECKNUM, m_CheckNum);
+	DDX_Text(pDX, IDC_CHECKNUM, m_CheckSub);
 	DDX_Text(pDX, IDC_CHECKUNAME, m_CheckUName);
 	DDX_Text(pDX, IDC_CHECKNAME, m_CheckName);
 }
@@ -45,7 +45,7 @@ void CResultCheck::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	UpdateData();
-	if (m_CheckNum==CString("")||m_CheckName==CString("")||m_CheckUName==CString(""))
+	if (m_CheckSub==CString("")||m_CheckName==CString("")||m_CheckUName==CString(""))
 	{
 		AfxMessageBox(CString("请先完成输入！"));
 		return;

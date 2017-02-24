@@ -17,16 +17,17 @@ class CDFMDlg : public CDialogEx
 public:
 	CDFMDlg(CWnd* pParent = NULL);	// 标准构造函数
 	//状态栏相关变量
-	int index1,   //标识面板索引
-		index2,
-		index3,
-		nWidth1,  //保存IDS_INDICATOR_MESSAGE, IDS_INDICATOR_TIME宽度
-		nWidth2,
-		nWidth3;
-	UINT  nID,    //用于接收面板ID
-		nStyle; //用于接收面板风格
+	//int index1,   //标识面板索引
+	//	index2,
+	//	index3,
+	//	nWidth1,  //保存IDS_INDICATOR_MESSAGE, IDS_INDICATOR_TIME宽度
+	//	nWidth2,
+	//	nWidth3;
+	//UINT  nID,    //用于接收面板ID
+	//	nStyle; //用于接收面板风格
 
 	//_RecordsetPtr m_pRs;
+	UINT Array[5];
 	CStatusBar m_Statusbar;
 
 // 对话框数据
@@ -62,5 +63,6 @@ public:
 
 	CPInfoListCtrl m_ProductInfoList;
 	void ChangeStyle(CPInfoListCtrl &m_ListCtrl);//改变list风格
+	//void AutoAdjustColumnWidth(CListCtrl *pListCtrl) ;//调整list列宽 
     void UpdateListCtrl();    //list数据刷新
 };

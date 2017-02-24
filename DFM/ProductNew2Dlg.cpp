@@ -287,6 +287,7 @@ void CProductNew2Dlg::OnBnClickedEvalin2()
 			dlg1.DoModal();
 		}
 	}
+	CDialogEx::OnOK();
 }
 
 
@@ -545,20 +546,24 @@ void CProductNew2Dlg::GetIndexVal(VectorXd& dA1,VectorXd& dA2)
 	vTemp2<<cc1,cc2;
 	m_dC1=vTemp2;
 
-
-	//构建上级模糊矩阵
-	MatrixXd dR1(2,4);
-	for (int i=0;i<dR1.rows();++i)
+	if(c1==0||c2==0||c3==0||c4==0)
+		m_W=0;
+	else
 	{
-		for (int j=0;j<dR1.cols();++j)
+		//构建上级模糊矩阵
+		MatrixXd dR1(2,4);
+		for (int i=0;i<dR1.rows();++i)
 		{
-			if(i==0) dR1(i,j)=m_dB2[j];
-			else if(cc2==dV[j]) dR1(i,j)=1;
-			else dR1(i,j)=0;
+			for (int j=0;j<dR1.cols();++j)
+			{
+				if(i==0) dR1(i,j)=m_dB2[j];
+				else if(cc2==dV[j]) dR1(i,j)=1;
+				else dR1(i,j)=0;
+			}
 		}
+		m_dB1=dA1.transpose()*dR1; //评价整体对评价集的隶属度
+		m_W=m_dB1*dV;  //最终评分值
 	}
-	m_dB1=dA1.transpose()*dR1; //评价整体对评价集的隶属度
-	m_W=m_dB1*dV;  //最终评分值
 }
 
 
@@ -584,7 +589,9 @@ vector<CString>& CProductNew2Dlg::SetResultVal(vector<CString>& m_ItemVal)
 	m_ItemVal.clear();
 
 	CString strEvalVal,strEvalResult;
-	if (m_W>=0&&m_W<1.5)
+	if(m_W==0)
+		strEvalResult=CString("不可制造");
+	else if (m_W>0&&m_W<1.5)
 		strEvalResult=CString("可制造性差");
 	else if(m_W>=1.5&&m_W<2.5)
 		strEvalResult=CString("可制造性一般");
@@ -592,7 +599,7 @@ vector<CString>& CProductNew2Dlg::SetResultVal(vector<CString>& m_ItemVal)
 		strEvalResult=CString("可制造性好");
 	strEvalVal.Format(CString("%.3f"),m_W);
 	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductName);  //产品名称
-	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductNum);   //产品编号
+	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductSub);   //产品隶属组件
 	m_ItemVal.push_back(strEvalVal);      //综合评价分值
 	m_ItemVal.push_back(strEvalResult);   //综合评价结果
 	m_ItemVal.push_back(CString("双击显示详细信息"));   //低分项及改进显示

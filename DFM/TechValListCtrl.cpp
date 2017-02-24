@@ -5,7 +5,7 @@
 #include "DFM.h"
 #include "TechValListCtrl.h"
 #include <string>
-
+#include <algorithm>
 using namespace std;
 
 // CTechValListCtrl
@@ -249,18 +249,21 @@ BOOL CTechValListCtrl::MyBeginComboBox(void)
 //4 结束组合框编辑
 void CTechValListCtrl::MyEndComboBox(void)
 {
-	UpdateData();
-	CString txtItem;
-	//m_ComboBox.GetWindowTextW(txtItem);
-	m_ComboBox.GetLBText(m_ComboBox.GetCurSel(), txtItem);
-	SetItemText(m_nItem,m_nSubItem,txtItem);
+	if(m_ComboBox.GetCurSel()!=CB_ERR) //若combo选择某一项
+	{
+		UpdateData();
+		CString txtItem;
+		//m_ComboBox.GetWindowTextW(txtItem);
+		m_ComboBox.GetLBText(m_ComboBox.GetCurSel(), txtItem);
+		SetItemText(m_nItem,m_nSubItem,txtItem);
+		UpdateData(FALSE);
 
-	UpdateData(FALSE);
+		::SendMessageA(GetParent()->m_hWnd,WM_SETINDEXVAL,m_nItem,0);     //发送自定义消息给父窗口插入评分值
+	}
 	//销毁编辑窗口
 	m_ComboBox.DestroyWindow();
 	m_bEditing=FALSE;
 
-	::SendMessageA(GetParent()->m_hWnd,WM_SETINDEXVAL,m_nItem,0);     //发送自定义消息给父窗口插入评分值
 }
 
 
@@ -338,10 +341,12 @@ LRESULT CTechValListCtrl::OnComboSearch(WPARAM wParam,LPARAM lParam)
 	}
 
 	string str_search = (_bstr_t)(cstr_search);
+	transform(str_search.begin(),str_search.end(),str_search.begin(),::tolower); //转化成小写字母
 	string str_list;
 	for (int i=0;i<m_strlisCombo[m_nItem].size();++i)
 	{
 		str_list = (_bstr_t)(m_strlisCombo[m_nItem][i]);
+		transform(str_list.begin(),str_list.end(),str_list.begin(),::tolower); //转化成小写字母
 		//(str_list.find(str_search) != string::npos);
 		if (str_list.find(str_search) != string::npos)
 		{
@@ -485,7 +490,7 @@ CMyCombo1::~CMyCombo1()
 BEGIN_MESSAGE_MAP(CMyCombo1, CComboBox)
 	ON_CONTROL_REFLECT(CBN_SELCHANGE, &CMyCombo1::OnCbnSelchange)
 	ON_WM_CREATE()
-	//ON_CONTROL_REFLECT(CBN_KILLFOCUS, &CMyCombo1::OnCbnKillfocus)
+	ON_CONTROL_REFLECT(CBN_KILLFOCUS, &CMyCombo1::OnCbnKillfocus)
 	ON_CONTROL_REFLECT(CBN_EDITCHANGE, &CMyCombo1::OnCbnEditchange)
 END_MESSAGE_MAP()
 
@@ -544,16 +549,16 @@ void CMyCombo1::InitCombo(vector<CString>& lisStr)
 
 
 
-//void CMyCombo1::OnCbnKillfocus()
-//{
-//	// TODO: Add your control notification handler code here
-//	//得到父窗口，并通知父窗口结束编辑过程
-//	CTechValListCtrl *parent=(CTechValListCtrl*)GetParent();
-//	if(parent&&!bMatching)
-//	{
-//		parent->MyEndComboBox();
-//	}
-//}
+void CMyCombo1::OnCbnKillfocus()
+{
+	// TODO: Add your control notification handler code here
+	//得到父窗口，并通知父窗口结束编辑过程
+	CTechValListCtrl *parent=(CTechValListCtrl*)GetParent();
+	if(parent&&!bMatching)
+	{
+		parent->MyEndComboBox();
+	}
+}
 
 
 void CMyCombo1::OnCbnSelchange()

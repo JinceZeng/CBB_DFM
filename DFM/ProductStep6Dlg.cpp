@@ -304,7 +304,7 @@ void CProductStep6Dlg::SaveLowValItem()
 void CProductStep6Dlg::SaveChartInfo()
 {
 	_RecordsetPtr m_pRs;  //先删除之前记录信息，避免数据重复储存
-	CString sql = CString("delete * from ChartInfoSave where ProductNam='") + m_ProductInfo.m_ProductName+CString("'and ProductNum='")+m_ProductInfo.m_ProductNum+CString("'and ChartName='")+CString("工艺成熟度表")+CString("'and Uname='")+theApp.name+("'");
+	CString sql = CString("delete * from ChartInfoSave where ProductNam='") + m_ProductInfo.m_ProductName+CString("'and ProductSub='")+m_ProductInfo.m_ProductSub+CString("'and ChartName='")+CString("工艺成熟度表")+CString("'and Uname='")+theApp.name+("'");
 	try
 	{
 		m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
@@ -323,8 +323,8 @@ void CProductStep6Dlg::SaveChartInfo()
 	{
 		for(int i=0;i<m_ListCtrlItem.size();++i)
 		{
-			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into ChartInfoSave(ProductNam,ProductNum,Uname,ChartName,Row1,Row2,Row3) values('")
-				+m_ProductInfo.m_ProductName+"','"+m_ProductInfo.m_ProductNum+"','"+theApp.name+"','"+CString("工艺成熟度表")+"','"+m_ListCtrlItem[i].m_TechNam+"','"+m_ListCtrlItem[i].m_TechUseStatus+"','"+m_ListCtrlItem[i].m_TechMaturyVal+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
+			theApp.m_pConnect->Execute((_bstr_t)(CString("insert into ChartInfoSave(ProductNam,ProductSub,Uname,ChartName,Row1,Row2,Row3) values('")
+				+m_ProductInfo.m_ProductName+"','"+m_ProductInfo.m_ProductSub+"','"+theApp.name+"','"+CString("工艺成熟度表")+"','"+m_ListCtrlItem[i].m_TechNam+"','"+m_ListCtrlItem[i].m_TechUseStatus+"','"+m_ListCtrlItem[i].m_TechMaturyVal+("')")) , NULL, adCmdText);   //insert操作时数据库中对应字符型需加‘’
 		}
 	}
 	catch(_com_error e)
@@ -341,7 +341,7 @@ void CProductStep6Dlg::InitChartInfo()
 {
 	_RecordsetPtr m_pRs;    //读取历史评价输入信息
 	CMaturyChartItem OneItem;//临时存储每条list的信息
-	CString sql = CString("select * from ChartInfoSave where ProductNum='") + m_ProductInfo.m_ProductNum+CString("'and ChartName= '")+CString("工艺成熟度表")+CString("'and Uname= '")+theApp.name+CString("'");
+	CString sql = CString("select * from ChartInfoSave where ProductSub='") + m_ProductInfo.m_ProductSub+CString("'and ChartName= '")+CString("工艺成熟度表")+CString("'and Uname= '")+theApp.name+CString("'");
 	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
 	int k=0;
 	while (!m_pRs->adoEOF)

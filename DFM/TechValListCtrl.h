@@ -62,7 +62,7 @@ public:
 	afx_msg void OnCbnSelchange();                         //结束编辑
 	void InitCombo(vector<CString>& lisStr);               //初始化组合框列表,动态变化是个麻烦事
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	//afx_msg void OnCbnKillfocus();                   //失去焦点后结束编辑
+	afx_msg void OnCbnKillfocus();                   //失去焦点后结束编辑
 	afx_msg void OnCbnEditchange();                    //combo编辑改变后响应
 };
 

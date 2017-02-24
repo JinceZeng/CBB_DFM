@@ -59,10 +59,20 @@ void CProductNewDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CProductNewDlg, CDialogEx)
 	ON_WM_CTLCOLOR()
 	ON_WM_DESTROY()
+	ON_WM_PAINT()
+	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_EVALPRE, &CProductNewDlg::OnBnClickedEvalpre)
 	ON_BN_CLICKED(IDC_EVALNEXT, &CProductNewDlg::OnBnClickedEvalnext)
 	ON_BN_CLICKED(IDC_EVALIN, &CProductNewDlg::OnBnClickedEvalin)
 END_MESSAGE_MAP()
+
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductNewDlg, CDialogEx) 
+	//EASYSIZE(IDC_EVALPRE,ES_BORDER,ES_BORDER,ES_KEEPSIZE,ES_KEEPSIZE,0) //此处根据自己需求 
+	//EASYSIZE(IDC_EVALNEXT,IDC_EVALPRE,ES_BORDER,ES_KEEPSIZE,ES_KEEPSIZE,0)
+	//EASYSIZE(IDC_EVALIN,IDC_EVALNEXT,ES_BORDER,ES_BORDER,ES_KEEPSIZE,ES_HCENTER)
+	EASYSIZE(IDC_STATIC_PLANE,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 
 
 // CProductNewDlg message handlers
@@ -241,6 +251,8 @@ BOOL CProductNewDlg::OnInitDialog()
 	m_btnChart5.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
 	m_btnChart6.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
 
+
+	INIT_EASYSIZE;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -248,10 +260,74 @@ BOOL CProductNewDlg::OnInitDialog()
 
 
 
+// 如果向对话框添加最小化按钮，则需要下面的代码
+//  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
+//  这将由框架自动完成。
+
+void CProductNewDlg::OnPaint()
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // 用于绘制的设备上下文
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		//// 使图标在工作区矩形中居中
+		//int cxIcon = GetSystemMetrics(SM_CXICON);
+		//int cyIcon = GetSystemMetrics(SM_CYICON);
+		//CRect rect;
+		//GetClientRect(&rect);
+		//int x = (rect.Width() - cxIcon + 1) / 2;
+		//int y = (rect.Height() - cyIcon + 1) / 2;
+
+		//// 绘制图标
+		//dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		CDialogEx::OnPaint();
+	}
+}
 
 
+//响应窗口大小变化
+void CProductNewDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
 
+	// TODO: Add your message handler code here
+	//改变状态栏大小
+	CRect rectDlg,rectBar;
+	GetClientRect(rectDlg);
+	//if (m_ProductInfoList&&(0 != rectDlg.Width()))   //list内容刷新
+	//{
+	//	CRect rec1;
+	//	int width1;
+	//	m_ProductInfoList.GetClientRect(&rec1);
+	//	width1=rec1.Width();
+	//	if(0!=width1)//如果窗口宽度不为零则重绘list
+	//	{
+	//		int  nColumnCount = m_ProductInfoList.GetHeaderCtrl()->GetItemCount();
+	//		for (int i=nColumnCount-1;i>=0;--i)
+	//		{
+	//			m_ProductInfoList.DeleteColumn(i);
+	//		}
+	//		m_ProductInfoList.InsertColumn(0,_T("序号"), LVCFMT_CENTER,width1/16);
+	//		m_ProductInfoList.InsertColumn(1,_T("ID"), LVCFMT_CENTER,width1/16);
+	//		m_ProductInfoList.InsertColumn(2,_T("产品名称"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(3,_T("产品编号"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(4,_T("隶属整件"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(5,_T("评价模型"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(6,_T("任务状态"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(7,_T("评价人"),LVCFMT_CENTER,width1/8);
+	//		m_ProductInfoList.InsertColumn(8,_T("评价时间"),LVCFMT_CENTER,width1/8);
 
+	//		UpdateListCtrl();
+	//	}
+
+	//}
+	UPDATE_EASYSIZE;
+}
 
 
 HBRUSH CProductNewDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
@@ -329,6 +405,7 @@ void CProductNewDlg::OnBnClickedEvalin()
 			dlg1.DoModal();
 		}
 	}
+	CDialogEx::OnOK();
 }
 
 
@@ -685,20 +762,24 @@ void CProductNewDlg::GetIndexVal(VectorXd& dA1,VectorXd& dA2)
 	vTemp2<<cc1,cc2;
 	m_dC1=vTemp2;
 
-
-	//构建上级模糊矩阵
-	MatrixXd dR1(2,4);
-	for (int i=0;i<dR1.rows();++i)
+	if(c1==0||c2==0||c3==0||c4==0||c5==0||c6==0)    //若有一项指标评分值为零，则综合评价值直接为零
+		m_W=0;
+	else
 	{
-		for (int j=0;j<dR1.cols();++j)
+		//构建上级模糊矩阵
+		MatrixXd dR1(2,4);
+		for (int i=0;i<dR1.rows();++i)
 		{
-			if(i==0) dR1(i,j)=m_dB2[j];
-			else if(cc2==dV[j]) dR1(i,j)=1;
-			else dR1(i,j)=0;
+			for (int j=0;j<dR1.cols();++j)
+			{
+				if(i==0) dR1(i,j)=m_dB2[j];
+				else if(cc2==dV[j]) dR1(i,j)=1;
+				else dR1(i,j)=0;
+			}
 		}
-	}
-	m_dB1=dA1.transpose()*dR1; //评价整体对评价集的隶属度
-	m_W=m_dB1*dV;  //最终评分值
+		m_dB1=dA1.transpose()*dR1; //评价整体对评价集的隶属度
+		m_W=m_dB1*dV;  //最终评分值
+	}	
 }
 
 
@@ -724,7 +805,9 @@ vector<CString>& CProductNewDlg::SetResultVal(vector<CString>& m_ItemVal)
 	m_ItemVal.clear();
 
 	CString strEvalVal,strEvalResult;
-	if (m_W>=0&&m_W<1.5)
+	if(m_W==0)
+		strEvalResult=CString("不可制造");
+	else if (m_W>0&&m_W<1.5)
 		strEvalResult=CString("可制造性差");
 	else if(m_W>=1.5&&m_W<2.5)
 		strEvalResult=CString("可制造性一般");
@@ -732,7 +815,7 @@ vector<CString>& CProductNewDlg::SetResultVal(vector<CString>& m_ItemVal)
 		strEvalResult=CString("可制造性好");
 	strEvalVal.Format(CString("%.3f"),m_W);
 	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductName);  //产品名称
-	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductNum);   //产品编号
+	m_ItemVal.push_back(((CProductStep0Dlg*)m_pPageList[0])->m_ProductSub);   //产品隶属组件
 	m_ItemVal.push_back(strEvalVal);      //综合评价分值
 	m_ItemVal.push_back(strEvalResult);   //综合评价结果
 	m_ItemVal.push_back(CString("双击显示详细信息"));   //低分项及改进显示
