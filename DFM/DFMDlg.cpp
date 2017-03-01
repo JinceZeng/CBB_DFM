@@ -283,6 +283,7 @@ void CDFMDlg::OnSize(UINT nType, int cx, int cy)
 	CDialogEx::OnSize(nType, cx, cy);
 
 	// TODO: Add your message handler code here
+	LockWindowUpdate();
 	//改变状态栏大小
 	CRect rectDlg,rectBar;
 	GetClientRect(rectDlg);
@@ -300,8 +301,8 @@ void CDFMDlg::OnSize(UINT nType, int cx, int cy)
 		m_pwndStatusBar->MoveWindow(0,cy-rectBar.Height(),rectDlg.Width(),rectBar.Height());  
 
 	}
-	if (m_ProductInfoList&&(0 != rectDlg.Width()))   //list内容刷新
-	{
+	//if (m_ProductInfoList&&(0 != rectDlg.Width()))   //list内容刷新
+	//{
 		//CRect rec1;
 		//int width1;
 		//m_ProductInfoList.GetClientRect(&rec1);
@@ -326,32 +327,33 @@ void CDFMDlg::OnSize(UINT nType, int cx, int cy)
 		//	UpdateListCtrl();
 		//}
 		//AutoAdjustColumnWidth(&m_ProductInfoList);
+	//}
 
-
-		if(m_ProductInfoList.m_hWnd != NULL)
+	if(m_ProductInfoList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_ProductInfoList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 720)
 		{
-			CRect rc;
-			m_ProductInfoList.GetClientRect(rc);
-			//m_ProductInfoList.MoveWindow(rc);
-			//
-			int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
-			int nWidth = rc.Width() - nScrollWidth - 2;
-			if(nWidth > 720)
-			{
-				m_ProductInfoList.SetColumnWidth(0,nWidth/16);
-				m_ProductInfoList.SetColumnWidth(1,nWidth/16);
-				m_ProductInfoList.SetColumnWidth(2,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(3,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(4,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(5,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(6,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(7,nWidth/8);
-				m_ProductInfoList.SetColumnWidth(8,nWidth/8);
-			}  
-		}
+			m_ProductInfoList.SetColumnWidth(0,nWidth/16);
+			m_ProductInfoList.SetColumnWidth(1,nWidth/16);
+			m_ProductInfoList.SetColumnWidth(2,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(3,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(4,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(5,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(6,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(7,nWidth/8);
+			m_ProductInfoList.SetColumnWidth(8,nWidth/8);
+		}  
 	}
 	
 	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+
 }
 
 

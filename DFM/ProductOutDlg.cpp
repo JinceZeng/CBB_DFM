@@ -175,7 +175,7 @@ void CProductOutDlg::OnBnClickedOk()
 
 		//更新产品评价状态
 		theApp.m_pConnect->Execute((_bstr_t)(CString("update ProductInfo set IsEval=")+CString("1 where ProductNam='")+m_ListCtrlItem[0].m_ItemVal+CString("' and ProductSub='")+m_ListCtrlItem[1].m_ItemVal+CString("'and Uname='")+theApp.name+CString("'")) , NULL, adCmdText);
-		
+		::SendMessage(AfxGetMainWnd()->m_hWnd,WM_UPDATELIST,0,0);	//更新主对话框list显示		
 		AfxMessageBox(CString("评价结果保存成功"));	
 	}
 

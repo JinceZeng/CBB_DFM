@@ -35,8 +35,14 @@ void CProductStep2Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CProductStep2Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_INPUTMAT, &CProductStep2Dlg::OnBnClickedInputmat)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep2Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_MAT,ES_BORDER,ES_BORDER,ES_BORDER,IDC_INPUTMAT,0)
+	EASYSIZE(IDC_INPUTMAT,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,ES_HCENTER)
+END_EASYSIZE_MAP 
 
 // CProductStep2Dlg message handlers
 
@@ -71,10 +77,40 @@ BOOL CProductStep2Dlg::OnInitDialog()
 	m_MatInfoList.SetnNoEditList(nNoEdit);
 	vector<int>().swap(nNoEdit);//释放vector
 
-
+	INIT_EASYSIZE;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
+
+
+
+void CProductStep2Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_MatInfoList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_MatInfoList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_MatInfoList.SetColumnWidth(0,nWidth/10);
+			m_MatInfoList.SetColumnWidth(1,nWidth*3/10);
+			m_MatInfoList.SetColumnWidth(2,nWidth*3/10);
+			m_MatInfoList.SetColumnWidth(3,nWidth/10);
+			m_MatInfoList.SetColumnWidth(4,nWidth/5);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+}
+
 
 /////////////////////////////////////激活当前页(从上一页或下一页转到本页都会调用)
 //由于只有一个结构信息，利用CListCtl的缓存可以保存信息，不用自己更新CListCtrl
@@ -337,3 +373,5 @@ void CProductStep2Dlg::GetProInfo(CProductInfo& m_ProductInfo)
 {
 	this->m_ProductInfo=m_ProductInfo;
 }
+
+

@@ -239,7 +239,6 @@ BOOL CTechValListCtrl::MyBeginComboBox(void)
 	//m_ComboBox.SetCurSel(n);
 
 	}
-
 	m_ComboBox.SetFocus();
 	m_ComboBox.ShowWindow(SW_SHOW);
 
@@ -247,23 +246,25 @@ BOOL CTechValListCtrl::MyBeginComboBox(void)
 }
 
 //4 结束组合框编辑
-void CTechValListCtrl::MyEndComboBox(void)
+void CTechValListCtrl::MyEndComboBox(bool bValidate)
 {
-	if(m_ComboBox.GetCurSel()!=CB_ERR) //若combo选择某一项
+	if (bValidate)
 	{
-		UpdateData();
-		CString txtItem;
-		//m_ComboBox.GetWindowTextW(txtItem);
-		m_ComboBox.GetLBText(m_ComboBox.GetCurSel(), txtItem);
-		SetItemText(m_nItem,m_nSubItem,txtItem);
-		UpdateData(FALSE);
+		if(m_ComboBox.GetCurSel()!=CB_ERR) //若combo选择某一项
+		{
+			UpdateData();
+			CString txtItem;
+			//m_ComboBox.GetWindowTextW(txtItem);
+			m_ComboBox.GetLBText(m_ComboBox.GetCurSel(), txtItem);
+			SetItemText(m_nItem,m_nSubItem,txtItem);
+			UpdateData(FALSE);
 
-		::SendMessageA(GetParent()->m_hWnd,WM_SETINDEXVAL,m_nItem,0);     //发送自定义消息给父窗口插入评分值
+			::SendMessageA(GetParent()->m_hWnd,WM_SETINDEXVAL,m_nItem,0);     //发送自定义消息给父窗口插入评分值
+		}
 	}
 	//销毁编辑窗口
 	m_ComboBox.DestroyWindow();
 	m_bEditing=FALSE;
-
 }
 
 
@@ -477,7 +478,7 @@ BOOL CMyEdit1::PreTranslateMessage(MSG* pMsg)
 IMPLEMENT_DYNAMIC(CMyCombo1, CComboBox)
 
 CMyCombo1::CMyCombo1():
-bMatching(FALSE)
+	m_bInputValid(TRUE)
 {
 
 }
@@ -531,6 +532,7 @@ int CMyCombo1::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_font.DeleteObject();
 	if(m_font.CreateFontIndirectW(&logfont))
 		SetFont(&m_font);
+
 	return 0;
 
 }
@@ -549,15 +551,23 @@ void CMyCombo1::InitCombo(vector<CString>& lisStr)
 
 
 
-void CMyCombo1::OnCbnKillfocus()
+void CMyCombo1::OnCbnKillfocus()   //killfocus会响应MessageBox慎用，避免冲突
 {
 	// TODO: Add your control notification handler code here
 	//得到父窗口，并通知父窗口结束编辑过程
 	CTechValListCtrl *parent=(CTechValListCtrl*)GetParent();
-	if(parent&&!bMatching)
+	if(parent)
 	{
-		parent->MyEndComboBox();
+		//parent->MyEndComboBox(m_bInputValid);
+		//m_bInputValid=TRUE;
+		//销毁编辑窗口
+		if(this->m_hWnd)
+		{
+			this->DestroyWindow();
+		}
+		parent->m_bEditing=FALSE;
 	}
+
 }
 
 
@@ -569,7 +579,8 @@ void CMyCombo1::OnCbnSelchange()
 	CTechValListCtrl *parent=(CTechValListCtrl*)GetParent();
 	if(parent)
 	{
-		parent->MyEndComboBox();
+		parent->MyEndComboBox(m_bInputValid);
+		m_bInputValid=TRUE;
 	}
 }
 

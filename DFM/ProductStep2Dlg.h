@@ -2,13 +2,14 @@
 #include "afxcmn.h"
 #include "goldata.h"
 #include "TechValListCtrl.h"
+#include "EasySize.h"
 
 // CProductStep2Dlg dialog
 
 class CProductStep2Dlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CProductStep2Dlg)
-
+	DECLARE_EASYSIZE
 public:
 	CProductStep2Dlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CProductStep2Dlg();
@@ -18,6 +19,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 public:

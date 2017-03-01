@@ -55,10 +55,11 @@ public:
 
 protected:
 	CFont m_font;
-    bool bMatching;    //匹配中
+	BOOL m_bInputValid;
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
+	//bool isEnded;    //匹配中
 	afx_msg void OnCbnSelchange();                         //结束编辑
 	void InitCombo(vector<CString>& lisStr);               //初始化组合框列表,动态变化是个麻烦事
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -104,7 +105,7 @@ public:
 	BOOL MyBeginEdit(void);
 	BOOL MyBeginComboBox(void);     //开始编辑组合框
 	void MyEndEdit(bool bValidate);
-	void MyEndComboBox(void);         //结束组合框编辑
+	void MyEndComboBox(bool bValidate);         //结束组合框编辑
 
 	virtual void PreSubclassWindow();
 	//afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);

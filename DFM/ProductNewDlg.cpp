@@ -18,6 +18,7 @@ CProductNewDlg::CProductNewDlg(CWnd* pParent /*=NULL*/)
 	,m_EvalType(CString(""))
 	,str_EvalTypeID(CString(""))
 {
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON_NEW);
 	m_pPageList.clear();            //记录各子对话框
 	m_rectPanel=CRect(0,0,0,0);     //子对话框的包围圈
 }
@@ -81,7 +82,12 @@ END_EASYSIZE_MAP
 BOOL CProductNewDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	
+
+	//设置图标
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
+	SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON_NEW)), TRUE);
+
 	//获取子对话框的包容矩形
 	GetDlgItem(IDC_STATIC_PLANE)->GetWindowRect(&m_rectPanel);
 	ScreenToClient(&m_rectPanel);
@@ -272,16 +278,16 @@ void CProductNewDlg::OnPaint()
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		//// 使图标在工作区矩形中居中
-		//int cxIcon = GetSystemMetrics(SM_CXICON);
-		//int cyIcon = GetSystemMetrics(SM_CYICON);
-		//CRect rect;
-		//GetClientRect(&rect);
-		//int x = (rect.Width() - cxIcon + 1) / 2;
-		//int y = (rect.Height() - cyIcon + 1) / 2;
+		// 使图标在工作区矩形中居中
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		//// 绘制图标
-		//dc.DrawIcon(x, y, m_hIcon);
+		// 绘制图标
+		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
 	{
@@ -296,37 +302,25 @@ void CProductNewDlg::OnSize(UINT nType, int cx, int cy)
 	CDialogEx::OnSize(nType, cx, cy);
 
 	// TODO: Add your message handler code here
-	//改变状态栏大小
-	CRect rectDlg,rectBar;
-	GetClientRect(rectDlg);
-	//if (m_ProductInfoList&&(0 != rectDlg.Width()))   //list内容刷新
-	//{
-	//	CRect rec1;
-	//	int width1;
-	//	m_ProductInfoList.GetClientRect(&rec1);
-	//	width1=rec1.Width();
-	//	if(0!=width1)//如果窗口宽度不为零则重绘list
-	//	{
-	//		int  nColumnCount = m_ProductInfoList.GetHeaderCtrl()->GetItemCount();
-	//		for (int i=nColumnCount-1;i>=0;--i)
-	//		{
-	//			m_ProductInfoList.DeleteColumn(i);
-	//		}
-	//		m_ProductInfoList.InsertColumn(0,_T("序号"), LVCFMT_CENTER,width1/16);
-	//		m_ProductInfoList.InsertColumn(1,_T("ID"), LVCFMT_CENTER,width1/16);
-	//		m_ProductInfoList.InsertColumn(2,_T("产品名称"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(3,_T("产品编号"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(4,_T("隶属整件"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(5,_T("评价模型"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(6,_T("任务状态"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(7,_T("评价人"),LVCFMT_CENTER,width1/8);
-	//		m_ProductInfoList.InsertColumn(8,_T("评价时间"),LVCFMT_CENTER,width1/8);
-
-	//		UpdateListCtrl();
-	//	}
-
-	//}
+	LockWindowUpdate();
+	CWnd *pWnd;         //调整子窗口大小
+	pWnd=GetDlgItem(IDC_STATIC_PLANE);
+	if (pWnd)      //获取控件句柄不为空时执行
+	{
+		CRect rect;
+		pWnd->GetWindowRect(&rect);
+		ScreenToClient(&rect);
+		if (0 != rect.Width())//最小化显示时不执行
+		{
+			for(int i=0;i<m_pPageList.size();++i)
+			{
+				m_pPageList[i]->MoveWindow(rect);
+			}
+		}
+	}
 	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+
 }
 
 

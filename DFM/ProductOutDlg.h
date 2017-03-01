@@ -2,6 +2,7 @@
 #include "afxcmn.h"
 #include "TechValListCtrl.h"
 #include "goldata.h"
+#include "PInfoListCtrl.h"//°üº¬WM_UPDATELIST¶¨Òå
 
 #include "IndexValChartDlg.h"
 #include "LowValChartDlg.h"

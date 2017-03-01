@@ -44,9 +44,18 @@ void CProductStep0Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CProductStep0Dlg, CDialogEx)
 	ON_MESSAGE(WM_UPDATEDATA,&CProductStep0Dlg::OnUpdateData)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep0Dlg, CDialogEx) 
+	EASYSIZE(IDC_PRODUCTNAME,ES_BORDER,ES_BORDER,ES_BORDER,IDC_PRODUCTNUM,0) //此处根据自己需求 
+	EASYSIZE(IDC_PRODUCTNUM,ES_BORDER,ES_BORDER,ES_BORDER,IDC_PRODUCTSUB,0)
+	EASYSIZE(IDC_PRODUCTSUB,ES_BORDER,ES_BORDER,ES_BORDER,IDC_EDIT_EVALTYPE,0)
+	EASYSIZE(IDC_EDIT_EVALTYPE,ES_BORDER,ES_BORDER,ES_BORDER,IDC_TYPEINFO,0)
+	EASYSIZE(IDC_TYPEINFO,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductStep0Dlg message handlers
 
 
@@ -66,7 +75,7 @@ BOOL CProductStep0Dlg::OnInitDialog()
 	//	m_pRs->MoveNext();
 	//}
 	//UpdateData(FALSE);  //把控制变量值赋给控件
-
+	INIT_EASYSIZE;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -142,6 +151,7 @@ DWORD CProductStep0Dlg::OnWizardNext()
 		//m_TypeInfo="";
 		//UpdateData(false);
 		SaveProductInfo();   //保存信息
+		::SendMessage(AfxGetMainWnd()->m_hWnd,WM_UPDATELIST,0,0);	//更新主对话框list显示	
 		AfxMessageBox(CString("新建评分保存成功"));
 
 		ShowWindow(SW_HIDE);
@@ -173,3 +183,17 @@ void CProductStep0Dlg::SaveProductInfo()
 	m_ProductInfo.m_TypeInfo=m_TypeInfo;
 	m_ProductInfo.m_isEval=m_isEval;
 }
+
+
+void CProductStep0Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate();
+
+}
+
+

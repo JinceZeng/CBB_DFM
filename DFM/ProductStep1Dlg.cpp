@@ -47,9 +47,13 @@ void CProductStep1Dlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CProductStep1Dlg, CDialogEx)
 	ON_MESSAGE(WM_SETINDEXVAL,&CProductStep1Dlg::OnSetIndexVal)
 	ON_MESSAGE(WM_INDEXMATCH,&CProductStep1Dlg::OnIndexMatch)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep1Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_TECHVAL,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductStep1Dlg message handlers
 
 
@@ -86,11 +90,41 @@ BOOL CProductStep1Dlg::OnInitDialog()
 	m_TechValList.SetnComboList(nComboLis);
 	vector<int>().swap(nComboLis);//释放vector
 
+	INIT_EASYSIZE;
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
 
+
+void CProductStep1Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_TechValList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_TechValList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_TechValList.SetColumnWidth(0,nWidth/10);
+			m_TechValList.SetColumnWidth(1,nWidth/10);
+			m_TechValList.SetColumnWidth(2,nWidth*3/10);
+			m_TechValList.SetColumnWidth(3,nWidth*2/5);
+			m_TechValList.SetColumnWidth(4,nWidth/10);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+
+}
 
 
 
@@ -597,3 +631,5 @@ void CProductStep1Dlg::InitChartInfo()
 	if (k==0)        //如果无该目标则直接跳出
 		return;
 }
+
+

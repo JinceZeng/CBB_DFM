@@ -37,9 +37,13 @@ void CProductStep5Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CProductStep5Dlg, CDialogEx)
 	ON_MESSAGE(WM_SETINDEXVAL,&CProductStep5Dlg::OnSetIndexVal)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep5Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_ECONOMY,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductStep5Dlg message handlers
 /////////////////////////////////////激活当前页(从上一页或下一页转到本页都会调用)
 //由于只有一个结构信息，利用CListCtl的缓存可以保存信息，不用自己更新CListCtrl
@@ -126,10 +130,39 @@ BOOL CProductStep5Dlg::OnInitDialog()
 	nComboLis.push_back(3);            //第三列有组合框控制
     m_EconomyList.SetnComboList(nComboLis);
 	vector<int>().swap(nComboLis);//释放vector
+
+	INIT_EASYSIZE;
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+void CProductStep5Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_EconomyList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_EconomyList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_EconomyList.SetColumnWidth(0,nWidth/10);
+			m_EconomyList.SetColumnWidth(1,nWidth/10);
+			m_EconomyList.SetColumnWidth(2,nWidth*3/10);
+			m_EconomyList.SetColumnWidth(3,nWidth*2/5);
+			m_EconomyList.SetColumnWidth(4,nWidth/10);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+}
 
 
 void CProductStep5Dlg::ReadTechChart(CProductInfo& m_ProductInfo)
@@ -390,3 +423,4 @@ void CProductStep5Dlg::InitChartInfo()
 	if (k==0)        //如果无该目标则直接跳出
 		return;
 }
+

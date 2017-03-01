@@ -46,9 +46,14 @@ BEGIN_MESSAGE_MAP(CProductStep3Dlg, CDialogEx)
 	ON_MESSAGE(WM_SETINDEXINFO,&CProductStep3Dlg::OnSetIndexInfo)
 	//ON_MESSAGE(WM_DELETEPDLG,&CProductStep3Dlg::OnDeletepDlg)
 	ON_MESSAGE(WM_SETINDEXVAL,&CProductStep3Dlg::OnSetIndexVal)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep3Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_IMPACTVAL,ES_BORDER,ES_BORDER,ES_BORDER,IDC_EDIT_INDEXINFO,0)
+	EASYSIZE(IDC_EDIT_INDEXINFO,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductStep3Dlg message handlers
 
 BOOL CProductStep3Dlg::OnInitDialog()
@@ -88,11 +93,37 @@ BOOL CProductStep3Dlg::OnInitDialog()
 	m_IndexInfoTxt.SetFont(&m_editFont); // 设置新字体
 	m_IndexInfoTxt.EnableWindow(FALSE);//设置不可编辑
 
+	INIT_EASYSIZE;
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+void CProductStep3Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
 
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_ImpactVibValList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_ImpactVibValList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_ImpactVibValList.SetColumnWidth(0,nWidth/20);
+			m_ImpactVibValList.SetColumnWidth(1,nWidth*3/10);
+			m_ImpactVibValList.SetColumnWidth(2,nWidth/4);
+			m_ImpactVibValList.SetColumnWidth(3,nWidth*3/10);
+			m_ImpactVibValList.SetColumnWidth(4,nWidth/10);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+}
 
 /////////////////////////////////////激活当前页(从上一页或下一页转到本页都会调用)
 //由于只有一个结构信息，利用CListCtl的缓存可以保存信息，不用自己更新CListCtrl
@@ -439,3 +470,5 @@ void CProductStep3Dlg::InitChartInfo()
 	if (k==0)        //如果无该目标则直接跳出
 		return;
 }
+
+

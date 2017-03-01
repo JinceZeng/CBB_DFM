@@ -60,9 +60,13 @@ BEGIN_MESSAGE_MAP(CProductNew1Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_EVALPRE1, &CProductNew1Dlg::OnBnClickedEvalpre1)
 	ON_BN_CLICKED(IDC_EVALNEXT1, &CProductNew1Dlg::OnBnClickedEvalnext1)
 	ON_BN_CLICKED(IDC_EVALIN1, &CProductNew1Dlg::OnBnClickedEvalin1)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductNew1Dlg, CDialogEx) 
+	EASYSIZE(IDC_STATIC_PLANE1,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductNew1Dlg message handlers
 
 
@@ -223,10 +227,37 @@ BOOL CProductNew1Dlg::OnInitDialog()
 	m_btnChart13.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
 	m_btnChart14.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
 	m_btnChart15.OffsetColor(CButtonST::BTNST_COLOR_BK_IN, shBtnColor);
+
+	INIT_EASYSIZE;
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+void CProductNew1Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	CWnd *pWnd;         //调整子窗口大小
+	pWnd=GetDlgItem(IDC_STATIC_PLANE1);
+	if (pWnd)      //获取控件句柄不为空时执行
+	{
+		CRect rect;
+		pWnd->GetWindowRect(&rect);
+		ScreenToClient(&rect);
+		if (0 != rect.Width())//最小化显示时不执行，否则窗口会隐藏
+		{
+			for(int i=0;i<m_pPageList.size();++i)
+			{
+				m_pPageList[i]->MoveWindow(rect);
+			}
+		}
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+}
 
 HBRUSH CProductNew1Dlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
@@ -758,3 +789,5 @@ void CProductNew1Dlg::SaveResultInfo(vector<CLowValItem>& m_LowValItem,vector<CI
 		}
 	}
 }
+
+

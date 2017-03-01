@@ -1,6 +1,8 @@
 #pragma once
 #include "afxwin.h"
 #include "goldata.h"
+#include "PInfoListCtrl.h"//包含WM_UPDATELIST定义
+#include "EasySize.h"
 
 #define WM_UPDATEDATA WM_USER+1    //更新对话框控件
 
@@ -9,6 +11,7 @@
 class CProductStep0Dlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CProductStep0Dlg)
+	DECLARE_EASYSIZE
 
 public:
 	CProductStep0Dlg(CWnd* pParent = NULL);   // standard constructor
@@ -19,6 +22,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -42,5 +46,7 @@ public:
 
 	afx_msg LRESULT OnUpdateData(WPARAM wParam,LPARAM lParam);//自定义消息更新控件信息
 	void SaveProductInfo();    //保存产品信息
+	
+	
 	
 };

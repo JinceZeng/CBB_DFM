@@ -4,14 +4,14 @@
 #include "TechValListCtrl.h"
 #include "goldata.h"
 #include "IndexInfo1Dlg.h"
-
+#include "EasySize.h"
 
 // CProductStep3Dlg dialog
 
 class CProductStep3Dlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CProductStep3Dlg)
-
+	DECLARE_EASYSIZE
 public:
 	CProductStep3Dlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CProductStep3Dlg();
@@ -21,6 +21,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 

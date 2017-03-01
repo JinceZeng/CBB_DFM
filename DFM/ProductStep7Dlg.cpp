@@ -39,9 +39,13 @@ BEGIN_MESSAGE_MAP(CProductStep7Dlg, CDialogEx)
 	ON_MESSAGE(WM_DETELE_INDEXITEM,&CProductStep7Dlg::OnDeleteIndexItem)
 	ON_MESSAGE(WM_ADD_INDEXITEM,&CProductStep7Dlg::OnAddIndexItem)
 	ON_MESSAGE(WM_SETINDEXVAL,&CProductStep7Dlg::OnSetIndexVal)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep7Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_MAT1,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 // CProductStep7Dlg message handlers
 DWORD CProductStep7Dlg::OnWizardActive()
 {
@@ -129,10 +133,39 @@ BOOL CProductStep7Dlg::OnInitDialog()
 	nComboLis.push_back(1);             //第三列有组合框控制
 	m_MatInfoList.SetnComboList(nComboLis);
 	vector<int>().swap(nComboLis);//释放vector
+
+	INIT_EASYSIZE;
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+void CProductStep7Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_MatInfoList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_MatInfoList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_MatInfoList.SetColumnWidth(0,nWidth/5);
+			m_MatInfoList.SetColumnWidth(1,nWidth/5);
+			m_MatInfoList.SetColumnWidth(2,nWidth/5);
+			m_MatInfoList.SetColumnWidth(3,nWidth/5);
+			m_MatInfoList.SetColumnWidth(4,nWidth/5);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
+}
 
 LRESULT CProductStep7Dlg::OnDeleteIndexItem(WPARAM wParam,LPARAM lParam)
 {
@@ -230,7 +263,9 @@ LRESULT CProductStep7Dlg::OnSetIndexVal(WPARAM wParam,LPARAM lParam)
 		if(str==strValInfo)   
 		{
 			AfxMessageBox(CString("所选材料重复！"));
-			OnDeleteIndexItem(0,0);         //如果选择相同删除这行
+			m_ListCtrlItem.pop_back();       //弹出最后一项
+			int n=m_MatInfoList.GetItemCount();
+			m_MatInfoList.DeleteItem(n-1);
 			return 0;
 		}
 	}
@@ -374,6 +409,11 @@ void CProductStep7Dlg::InitChartInfo()
 			m_MatInfoList.SetItemText(i,2,m_ListCtrlItem[i].m_Length);
 			m_MatInfoList.SetItemText(i,3,m_ListCtrlItem[i].m_Width);
 			m_MatInfoList.SetItemText(i,4,m_ListCtrlItem[i].m_Thick);
+
+			m_MatInfoList.SetComboString(m_MatType);   //将combo字符赋给listctrl扩展类中的m_strlisCombo用于combo初始化
+
 		}
 	}
 }
+
+

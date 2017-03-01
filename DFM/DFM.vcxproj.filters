@@ -40,6 +40,9 @@
     <None Include="res\control_panel_128px_1069375_easyicon.net.ico">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\new1.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DFM.h">

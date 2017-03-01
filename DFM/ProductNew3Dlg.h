@@ -1,6 +1,7 @@
 #pragma once
 #include "afxwin.h"
 #include "goldata.h"
+#include "EasySize.h"
 
 //æÿ’Û‘ÀÀ„ø‚eigen3.3
 #include <Eigen/Dense>
@@ -23,6 +24,7 @@ using namespace Eigen;
 class CProductNew3Dlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(CProductNew3Dlg)
+	DECLARE_EASYSIZE
 
 public:
 	CProductNew3Dlg(CWnd* pParent = NULL);   // standard constructor
@@ -33,6 +35,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 	DECLARE_MESSAGE_MAP()
 public:

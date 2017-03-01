@@ -39,8 +39,13 @@ BEGIN_MESSAGE_MAP(CProductStep6Dlg, CDialogEx)
 	ON_MESSAGE(WM_DETELE_INDEXITEM,&CProductStep6Dlg::OnDeleteIndexItem)
 	ON_MESSAGE(WM_ADD_INDEXITEM,&CProductStep6Dlg::OnAddIndexItem)
 	ON_MESSAGE(WM_SETINDEXVAL,&CProductStep6Dlg::OnSetIndexVal)
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
+//控件大小位置变化
+BEGIN_EASYSIZE_MAP(CProductStep6Dlg, CDialogEx) 
+	EASYSIZE(IDC_LIST_TECHMATURY,ES_BORDER,ES_BORDER,ES_BORDER,ES_BORDER,0)
+END_EASYSIZE_MAP 
 
 // CProductStep6Dlg message handlers
 /////////////////////////////////////激活当前页(从上一页或下一页转到本页都会调用)
@@ -135,8 +140,37 @@ BOOL CProductStep6Dlg::OnInitDialog()
 	m_TechMaturyList.SetnComboList(nComboLis);
 	vector<int>().swap(nComboLis);//释放vector
 
+
+	INIT_EASYSIZE;
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
+}
+
+void CProductStep6Dlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+	LockWindowUpdate();
+	if(m_TechMaturyList.m_hWnd != NULL)
+	{
+		CRect rc;
+		m_TechMaturyList.GetClientRect(rc);
+		//m_ProductInfoList.MoveWindow(rc);
+		//
+		int nScrollWidth = GetSystemMetrics(SM_CXVSCROLL) + 1;
+		int nWidth = rc.Width() - nScrollWidth - 2;
+		if(nWidth > 200)
+		{
+			m_TechMaturyList.SetColumnWidth(0,nWidth/8);
+			m_TechMaturyList.SetColumnWidth(1,nWidth*3/8);
+			m_TechMaturyList.SetColumnWidth(2,nWidth/4);
+			m_TechMaturyList.SetColumnWidth(3,nWidth/4);
+		}  
+	}
+	UPDATE_EASYSIZE;
+	UnlockWindowUpdate(); 
 }
 
 
@@ -230,7 +264,9 @@ LRESULT CProductStep6Dlg::OnSetIndexVal(WPARAM wParam,LPARAM lParam)
 		if(str==strValInfo)   
 		{
 			AfxMessageBox(CString("所选工艺重复！"));
-			OnDeleteIndexItem(0,0);         //如果选择相同删除这行
+			m_ListCtrlItem.pop_back();       //弹出最后一项
+			int n=m_TechMaturyList.GetItemCount();
+			m_TechMaturyList.DeleteItem(n-1);
 			return 0;
 		}
 	}
@@ -368,6 +404,11 @@ void CProductStep6Dlg::InitChartInfo()
 			m_TechMaturyList.SetItemText(i,2,m_ListCtrlItem[i].m_TechUseStatus);
 			m_TechMaturyList.SetItemText(i,3,m_ListCtrlItem[i].m_TechMaturyVal);
 
+			m_TechMaturyList.SetComboString(m_TechType);   //将combo字符赋给listctrl扩展类中的m_strlisCombo用于combo初始化
+
+
 		}
 	}
 }
+
+
