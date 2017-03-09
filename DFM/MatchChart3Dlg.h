@@ -25,4 +25,5 @@ public:
 	bool isMatch;          //ÊÇ·ñÂú×ãÆ¥Åä¹æÔò
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedOk();
+	afx_msg void OnCbnSelchangeComboKttype();
 };

@@ -45,7 +45,7 @@ void CResultCheck::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	UpdateData();
-	if (m_CheckSub==CString("")||m_CheckName==CString("")||m_CheckUName==CString(""))
+	if (m_CheckSub==CString("") && m_CheckName==CString("") && m_CheckUName==CString(""))
 	{
 		AfxMessageBox(CString("请先完成输入！"));
 		return;

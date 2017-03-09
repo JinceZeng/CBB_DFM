@@ -1,4 +1,3 @@
-
 // DFMDlg.cpp : 实现文件
 //
 
@@ -725,80 +724,159 @@ void CDFMDlg::OnProductEvalval()
 		CString strSub=dlg.m_CheckSub;
 		CString strUName=dlg.m_CheckUName;
 
-
-		_RecordsetPtr m_pRs;    //读取综合评价结果表
-		vector<CString> m_ItemVal; //结果值保存
-		CString sql = CString("select * from EvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+strUName+CString("'");
-		m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
-		int k=0;
-		CString str1,str2,str3,str4;
-		while (!m_pRs->adoEOF)
+		m_ProductInfoList.DeleteAllItems();
+		_RecordsetPtr m_pRs1;
+		CString sql;
+		if (strName!=CString("") && strSub==CString("") && strUName==CString(""))
 		{
-			str1 =  m_pRs->GetCollect("IntegEvalVal");
-			str2 =  m_pRs->GetCollect("IntegEvalResult");
-		    str3 =  m_pRs->GetCollect("LowValResult");
-			str4 =  m_pRs->GetCollect("IndexValResult");
-			++k;
-			m_pRs->MoveNext();
+			sql = CString("select * from ProductInfo where ProductNam='") + strName + CString("'");
 		}
-		if (k==0)        //如果无该目标则直接跳出
+		else if(strName==CString("") && strSub!=CString("") && strUName==CString(""))
 		{
-			AfxMessageBox(CString("该产品还未评价！"));
-			return;
+			sql = CString("select * from ProductInfo where ProductSub='") + strSub + CString("'");
 		}
-		m_ItemVal.push_back(strName);  //产品名称
-		m_ItemVal.push_back(strSub);   //产品隶属组件
-		m_ItemVal.push_back(str1);     //综合评价分值
-		m_ItemVal.push_back(str2);     //综合评价结果
-		m_ItemVal.push_back(str3);     //低分项及改进显示
-		m_ItemVal.push_back(str4);     //指标得分值显示
+		else if(strName==CString("") && strSub==CString("") && strUName!=CString(""))
+		{
+			sql = CString("select * from ProductInfo where Uname='") + strUName + CString("'");
+		}
+		else if(strName!=CString("") && strSub!=CString("") && strUName==CString(""))
 
-		_RecordsetPtr m_pRs1;    //读取低分项表
-		vector<CLowValItem> m_LowValItem;//低分项保存
-		CString sql1 = CString("select * from LowValResult where ProductSub='") + strSub +CString("'and ProductNam='")+strName+CString("'and Uname= '")+theApp.name+CString("'");
-		m_pRs1 = theApp.m_pConnect->Execute(_bstr_t(sql1), NULL, adCmdText);
+		{
+			sql = CString("select * from ProductInfo where ProductNam='") + strName + CString("'and ProductSub='")+strSub+CString("'");
+		}
+		else if(strName!=CString("") && strSub==CString("") && strUName!=CString(""))
+
+		{
+			sql = CString("select * from ProductInfo where ProductNam='") + strName + CString("'and Uname='")+strUName+CString("'");
+		}
+		else if(strName==CString("") && strSub!=CString("") && strUName!=CString(""))
+
+		{
+			sql = CString("select * from ProductInfo where ProductSub='") + strSub + CString("'and Uname='")+strUName+CString("'");
+		}
+		else if(strName!=CString("") && strSub!=CString("") && strUName!=CString(""))
+
+		{
+			sql = CString("select * from ProductInfo where ProductNam='") + strName + CString("'and ProductSub='")+strSub+CString("'and Uname='")+strUName+CString("'");
+		}
+		m_pRs1 = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
+
 		int n=0;
 		while (!m_pRs1->adoEOF)
 		{
-			CLowValItem OneLowValItem;
-			CString str;
-			str.Format(CString("%d"),n+1);
-			OneLowValItem.m_Item=str;
-			OneLowValItem.m_ChartNam=m_pRs1->GetCollect("ChartName");
-			OneLowValItem.m_Classify=m_pRs1->GetCollect("IndexClass");
-			OneLowValItem.m_TechEvalIndex=m_pRs1->GetCollect("IndexName");
-			OneLowValItem.m_IndexComment=m_pRs1->GetCollect("IndexComment");
-			OneLowValItem.m_LowValAdvice=m_pRs1->GetCollect("Advice");
+			CString str0;
+			str0.Format(CString("%d"),n+1); //int转cstring
+			CString str8 = (m_pRs1->GetCollect("ProductID"));       //数据库中int型数据获取后可不加cstring强制转换
+			CString str1 = (CString)(m_pRs1->GetCollect("ProductNam"));
+			CString str2 = (CString)(m_pRs1->GetCollect("ProductNum"));
+			CString str3 = (CString)(m_pRs1->GetCollect("ProductSub")); 
 
-			m_LowValItem.push_back(OneLowValItem);
+			CString str4;
+			CString str44 = m_pRs1->GetCollect("EvalModelID");
+			_RecordsetPtr m_pRs2;
+			CString sql = CString("select * from EvalModelInfo where EvalModelID=") + str44 ;
+			m_pRs2 = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
+			str4 =(CString)m_pRs2->GetCollect("EvalModelNam");
+
+
+			CString str5;
+			CString str55;
+			str55 = m_pRs1->GetCollect("IsEval");
+			int i = _ttoi(str55);                //cstring转int  
+			//int i=atoi((char *)(_bstr_t)str55);//cstring转int
+			if(i==0) str5=CString("进行中");
+			else     str5=CString("已发布");
+
+			CString str6 = theApp.name;
+			CString str7 = (CString)(m_pRs1->GetCollect("EvalTime"));
+
+			m_ProductInfoList.InsertItem(n,str0);
+			m_ProductInfoList.SetItemText(n,1,str8);
+			m_ProductInfoList.SetItemText(n,2,str1);
+			m_ProductInfoList.SetItemText(n,3,str2);
+			m_ProductInfoList.SetItemText(n,4,str3);
+			m_ProductInfoList.SetItemText(n,5,str4);
+			m_ProductInfoList.SetItemText(n,6,str5);
+			m_ProductInfoList.SetItemText(n,7,str6);
+			m_ProductInfoList.SetItemText(n,8,str7);
+
 			n++;
 			m_pRs1->MoveNext();
 		}
-
-
-		_RecordsetPtr m_pRs2;    //读取指标评分表
-		vector<CIndexValItem> m_IndexVal;//指标评分保存
-		CString sql2 = CString("select * from TechEvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+theApp.name+CString("'");
-		m_pRs2 = theApp.m_pConnect->Execute(_bstr_t(sql2), NULL, adCmdText);
-		int m=0;
-		while (!m_pRs2->adoEOF)
-		{
-			CIndexValItem OneItem;
-			CString str;
-			str.Format(CString("%d"),m+1);
-			OneItem.m_Item=str;
-			OneItem.m_IndexNam=m_pRs2->GetCollect("IndexName");
-			OneItem.m_IndexVal=m_pRs2->GetCollect("IndexVal");
-
-			m_IndexVal.push_back(OneItem);
-			m++;
-			m_pRs2->MoveNext();
-		}
-
-		CProductOutDlg dlg1;  //结果输出
-		dlg1.GetItemInfo(m_ItemVal);
-		dlg1.GetResultInfo(m_LowValItem,m_IndexVal);
-		dlg1.DoModal();
 	}
+	//	_RecordsetPtr m_pRs;    //读取综合评价结果表
+	//	vector<CString> m_ItemVal; //结果值保存
+	//	CString sql = CString("select * from EvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+strUName+CString("'");
+	//	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
+	//	int k=0;
+	//	CString str1,str2,str3,str4;
+	//	while (!m_pRs->adoEOF)
+	//	{
+	//		str1 =  m_pRs->GetCollect("IntegEvalVal");
+	//		str2 =  m_pRs->GetCollect("IntegEvalResult");
+	//	    str3 =  m_pRs->GetCollect("LowValResult");
+	//		str4 =  m_pRs->GetCollect("IndexValResult");
+	//		++k;
+	//		m_pRs->MoveNext();
+	//	}
+	//	if (k==0)        //如果无该目标则直接跳出
+	//	{
+	//		AfxMessageBox(CString("该产品还未评价！"));
+	//		return;
+	//	}
+	//	m_ItemVal.push_back(strName);  //产品名称
+	//	m_ItemVal.push_back(strSub);   //产品隶属组件
+	//	m_ItemVal.push_back(str1);     //综合评价分值
+	//	m_ItemVal.push_back(str2);     //综合评价结果
+	//	m_ItemVal.push_back(str3);     //低分项及改进显示
+	//	m_ItemVal.push_back(str4);     //指标得分值显示
+
+	//	_RecordsetPtr m_pRs1;    //读取低分项表
+	//	vector<CLowValItem> m_LowValItem;//低分项保存
+	//	CString sql1 = CString("select * from LowValResult where ProductSub='") + strSub +CString("'and ProductNam='")+strName+CString("'and Uname= '")+theApp.name+CString("'");
+	//	m_pRs1 = theApp.m_pConnect->Execute(_bstr_t(sql1), NULL, adCmdText);
+	//	int n=0;
+	//	while (!m_pRs1->adoEOF)
+	//	{
+	//		CLowValItem OneLowValItem;
+	//		CString str;
+	//		str.Format(CString("%d"),n+1);
+	//		OneLowValItem.m_Item=str;
+	//		OneLowValItem.m_ChartNam=m_pRs1->GetCollect("ChartName");
+	//		OneLowValItem.m_Classify=m_pRs1->GetCollect("IndexClass");
+	//		OneLowValItem.m_TechEvalIndex=m_pRs1->GetCollect("IndexName");
+	//		OneLowValItem.m_IndexComment=m_pRs1->GetCollect("IndexComment");
+	//		OneLowValItem.m_LowValAdvice=m_pRs1->GetCollect("Advice");
+
+	//		m_LowValItem.push_back(OneLowValItem);
+	//		n++;
+	//		m_pRs1->MoveNext();
+	//	}
+
+
+	//	_RecordsetPtr m_pRs2;    //读取指标评分表
+	//	vector<CIndexValItem> m_IndexVal;//指标评分保存
+	//	CString sql2 = CString("select * from TechEvalResult where ProductSub='") + strSub+CString("'and ProductNam='")+strName +CString("'and Uname= '")+theApp.name+CString("'");
+	//	m_pRs2 = theApp.m_pConnect->Execute(_bstr_t(sql2), NULL, adCmdText);
+	//	int m=0;
+	//	while (!m_pRs2->adoEOF)
+	//	{
+	//		CIndexValItem OneItem;
+	//		CString str;
+	//		str.Format(CString("%d"),m+1);
+	//		OneItem.m_Item=str;
+	//		OneItem.m_IndexNam=m_pRs2->GetCollect("IndexName");
+	//		OneItem.m_IndexVal=m_pRs2->GetCollect("IndexVal");
+
+	//		m_IndexVal.push_back(OneItem);
+	//		m++;
+	//		m_pRs2->MoveNext();
+	//	}
+
+	//	CProductOutDlg dlg1;  //结果输出
+	//	dlg1.GetItemInfo(m_ItemVal);
+	//	dlg1.GetResultInfo(m_LowValItem,m_IndexVal);
+	//	dlg1.DoModal();
+	//}
 }
 

@@ -35,6 +35,7 @@ void CMatchChart1Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMatchChart1Dlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CMatchChart1Dlg::OnBnClickedOk)
+	ON_CBN_SELCHANGE(IDC_COMBO_ADAPTER, &CMatchChart1Dlg::OnCbnSelchangeComboAdapter)
 END_MESSAGE_MAP()
 
 
@@ -67,25 +68,53 @@ void CMatchChart1Dlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	UpdateData(TRUE);
+	if(m_cmbAdapterType.GetCurSel()==CB_ERR)    //如果下拉单未选择返回重新选择
+	{
+		AfxMessageBox(CString("请先选择转接器型号！"));
+		return;
+	}
 	CString strType;
 	m_cmbAdapterType.GetLBText(m_cmbAdapterType.GetCurSel(),strType);//获取当前下拉单选择的值
-	_RecordsetPtr m_pRs;
-	CString sql = CString("select * from Adapter_WireMatching where AdapterType= '")+strType+CString("'");
-	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
-
-	//获取面积上下限要求
-	CString strArea=(CString)(m_pRs->GetCollect("AdapterArea"));
-	CString strAreaLower=strArea.Left(strArea.Find('-'));
-	CString strAreaTop=strArea.Right(strArea.GetLength()-strArea.Find('-')-1);
-	double dAreaLower=_tstof(strAreaLower);  //cstring转double
-	double dAreaTop=_tstof(strAreaTop);  
-
-	//获取线数要求 
-	CString strNum=(CString)(m_pRs->GetCollect("WireNum"));
-	int intNum = _ttoi(strNum);                //cstring转int 
-
-	if (m_dAdapterArea>dAreaLower&&m_dAdapterArea<dAreaTop&&m_nWireNum<=intNum)
+	if (strType==CString("无需转接器"))
 		isMatch=true;
-	else isMatch=false;
+	else
+	{
+		_RecordsetPtr m_pRs;
+		CString sql = CString("select * from Adapter_WireMatching where AdapterType= '")+strType+CString("'");
+		m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
+
+		//获取面积上下限要求
+		CString strArea=(CString)(m_pRs->GetCollect("AdapterArea"));
+		CString strAreaLower=strArea.Left(strArea.Find('-'));
+		CString strAreaTop=strArea.Right(strArea.GetLength()-strArea.Find('-')-1);
+		double dAreaLower=_tstof(strAreaLower);  //cstring转double
+		double dAreaTop=_tstof(strAreaTop);  
+
+		//获取线数要求 
+		CString strNum=(CString)(m_pRs->GetCollect("WireNum"));
+		int intNum = _ttoi(strNum);                //cstring转int 
+
+		if (m_dAdapterArea>dAreaLower&&m_dAdapterArea<dAreaTop&&m_nWireNum<=intNum)
+			isMatch=true;
+		else isMatch=false;
+	}
 	CDialogEx::OnOK();
+}
+
+
+void CMatchChart1Dlg::OnCbnSelchangeComboAdapter()
+{
+	// TODO: Add your control notification handler code here
+	CString strType;
+	m_cmbAdapterType.GetLBText(m_cmbAdapterType.GetCurSel(),strType);//获取当前下拉单选择的值
+	if(strType==CString("无需转接器"))
+	{
+		GetDlgItem(IDC_EDIT_ADAPTERAREA)->EnableWindow(FALSE);
+		GetDlgItem(IDC_EDIT_WIRENUM)->EnableWindow(FALSE);
+	}
+	else
+	{
+		GetDlgItem(IDC_EDIT_ADAPTERAREA)->EnableWindow(TRUE);
+		GetDlgItem(IDC_EDIT_WIRENUM)->EnableWindow(TRUE);
+	}
 }

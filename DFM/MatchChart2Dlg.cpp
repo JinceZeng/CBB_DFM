@@ -33,6 +33,7 @@ void CMatchChart2Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMatchChart2Dlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CMatchChart2Dlg::OnBnClickedOk)
+	ON_CBN_SELCHANGE(IDC_COMBO_TMSTYPE, &CMatchChart2Dlg::OnCbnSelchangeComboTmstype)
 END_MESSAGE_MAP()
 
 
@@ -65,21 +66,44 @@ void CMatchChart2Dlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	UpdateData(TRUE);
+	if(m_cmbTMSType.GetCurSel()==CB_ERR)    //如果下拉单未选择返回重新选择
+	{
+		AfxMessageBox(CString("请先选择TMS型号！"));
+		return;
+	}
 	CString strType;
 	m_cmbTMSType.GetLBText(m_cmbTMSType.GetCurSel(),strType);
-	_RecordsetPtr m_pRs;
-	CString sql = CString("select * from TMSMatching where TMSType= '")+strType+CString("'");
-	m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
-
-	//获取线径上下限要求
-	CString strDia=(CString)(m_pRs->GetCollect("WireDiameter"));
-	CString strDiaLower=strDia.Left(strDia.Find('-'));
-	CString strDiaTop=strDia.Right(strDia.GetLength()-strDia.Find('-')-1);
-	double intDiaLower=_tstof(strDiaLower);  //cstring转double
-	double intDiaTop=_tstof(strDiaTop);  
-
-	if (m_dWireD>intDiaLower&&m_dWireD<intDiaTop)
+	if(strType==CString("无需TMS"))
 		isMatch=true;
-	else isMatch=false;
+	else
+	{
+		_RecordsetPtr m_pRs;
+		CString sql = CString("select * from TMSMatching where TMSType= '")+strType+CString("'");
+		m_pRs = theApp.m_pConnect->Execute(_bstr_t(sql), NULL, adCmdText);
+
+		//获取线径上下限要求
+		CString strDia=(CString)(m_pRs->GetCollect("WireDiameter"));
+		CString strDiaLower=strDia.Left(strDia.Find('-'));
+		CString strDiaTop=strDia.Right(strDia.GetLength()-strDia.Find('-')-1);
+		double intDiaLower=_tstof(strDiaLower);  //cstring转double
+		double intDiaTop=_tstof(strDiaTop);  
+
+		if (m_dWireD>intDiaLower&&m_dWireD<intDiaTop)
+			isMatch=true;
+		else isMatch=false;
+	}
 	CDialogEx::OnOK();
+}
+
+
+void CMatchChart2Dlg::OnCbnSelchangeComboTmstype()
+{
+	// TODO: Add your control notification handler code here
+	CString strType;
+	m_cmbTMSType.GetLBText(m_cmbTMSType.GetCurSel(),strType);//获取当前下拉单选择的值
+	if(strType==CString("无需TMS"))
+		GetDlgItem(IDC_EDIT_WIRED)->EnableWindow(FALSE);
+	else
+		GetDlgItem(IDC_EDIT_WIRED)->EnableWindow(TRUE);
+
 }

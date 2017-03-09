@@ -32,6 +32,7 @@ void CMatchChart3Dlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CMatchChart3Dlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CMatchChart3Dlg::OnBnClickedOk)
+	ON_CBN_SELCHANGE(IDC_COMBO_KTType, &CMatchChart3Dlg::OnCbnSelchangeComboKttype)
 END_MESSAGE_MAP()
 
 
@@ -67,8 +68,32 @@ void CMatchChart3Dlg::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	UpdateData(TRUE);
-	if (m_cmbTMSType.GetCurSel()==m_cmbKTType.GetCurSel())
+	if(m_cmbKTType.GetCurSel()==CB_ERR)    //如果下拉单未选择返回重新选择
+	{
+		AfxMessageBox(CString("请先选择KT型号！"));
+		return;
+	}
+	CString strType;
+	m_cmbKTType.GetLBText(m_cmbKTType.GetCurSel(),strType);//获取当前下拉单选择的值
+	if (strType==CString("无需KT"))
 		isMatch=true;
-	else isMatch=false;
+	else
+	{
+		if (m_cmbTMSType.GetCurSel()==m_cmbKTType.GetCurSel())
+			isMatch=true;
+		else isMatch=false;
+	}
 	CDialogEx::OnOK();
+}
+
+
+void CMatchChart3Dlg::OnCbnSelchangeComboKttype()
+{
+	// TODO: Add your control notification handler code here
+	CString strType;
+	m_cmbKTType.GetLBText(m_cmbKTType.GetCurSel(),strType);//获取当前下拉单选择的值
+	if(strType==CString("无需KT"))
+		GetDlgItem(IDC_COMBO_TMSTYPE)->EnableWindow(FALSE);
+	else
+		GetDlgItem(IDC_COMBO_TMSTYPE)->EnableWindow(TRUE);
 }
